@@ -1,16 +1,33 @@
-<!doctype HTML>
+<!DOCTYPE html>
 <html>
-<script src="https://aframe.io/releases/0.6.1/aframe.min.js"></script>
-<script src="aframe-ar.js"> </script>
-<body style='margin : 0px; overflow: hidden;'>
-<a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
-    <a-marker preset='custom' url='pattern.patt'>
-        <a-box position='0 0.5 0' material='color: green;opacity: 0.5'></a-box>
+  <head>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+
+    <!-- A tag abaixo define o que aparecerá para o marcador com o texto "Ar.js".-->
+    <a-marker type="pattern" url="https://cdn.glitch.global/733a1874-bcf5-4039-95ab-793633c5b219/arjs.patt?v=1744220520506">
+        <a-box position="0 0.5 0" rotation="0 0 0" color="#4CC3D9"></a-box>
+      </a-marker>
+
+    <!-- A tag abaixo define o que aparecerá para o marcador com o texto "Hiro" (padrão).-->
+      <a-marker preset="hiro">
+        <a-sphere position="0 0.5 0" radius="1.25" color="#EF2D5E"></a-sphere>
+        <a-cylinder position="0 1.75 0" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+      </a-marker>
+    <!-- A tag abaixo define o que aparecerá para o marcador com uma ilustração geométrica.-->
+    <a-marker type="pattern" url="https://cdn.glitch.global/733a1874-bcf5-4039-95ab-793633c5b219/custom.patt?v=1744217292789">
+      <a-entity
+        gltf-model="https://cdn.glitch.global/733a1874-bcf5-4039-95ab-793633c5b219/Avocado.glb?v=1744221808454"
+                rotation="0 180 0"
+                scale="20 20 20"
+        ></a-entity>
     </a-marker>
-    <a-marker preset='hiro'>
-        <a-box position='0 0.5 0' material='color: red;opacity: 0.5'></a-box>
-    </a-marker>
-    <a-entity camera></a-entity>
-</a-scene>
-</body>
+
+      <!-- Camera with position override to avoid conflicts -->
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
 </html>
