@@ -42,17 +42,24 @@ ar-ecoa/
 │   ├── arjs.patt      # Padrão AR.js
 │   ├── custom.patt    # Padrão customizado
 │   └── Avocado.glb    # Modelo 3D do abacate
+├── images/
+│   ├── hiro.png       # Imagem do padrão Hiro
+│   ├── arjs.png       # Imagem do padrão AR.js
+│   └── custom.png     # Imagem do padrão customizado
 ├── index.html         # Página inicial
 ├── ar.html           # Experiência AR
-├── cert.pem          # Certificado SSL
-├── key.pem           # Chave SSL
+├── cert.pem          # Certificado SSL (local)
+├── key.pem           # Chave SSL (local)
+├── .gitignore        # Arquivos ignorados pelo git
 └── README.md
 ```
 
-3. **Gerar certificado SSL (necessário apenas para a primeira vez):**
+3. **Gerar certificado SSL (primeira vez):**
 ```bash
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=localhost"
 ```
+
+**⚠️ Importante:** Os certificados SSL são apenas para desenvolvimento local e **não devem** ser commitados no repositório. Eles já estão incluídos no `.gitignore`.
 
 4. **Instalar servidor HTTPS:**
 ```bash
@@ -69,6 +76,16 @@ http-server . -p 8443 -S -C cert.pem -K key.pem
 https://localhost:8443
 ```
 *Aceite o aviso de segurança quando solicitado*
+
+### Imagens dos Marcadores
+
+Para uma melhor experiência do usuário, adicione imagens dos marcadores na pasta `images/`:
+
+- `images/hiro.png` - Captura do padrão Hiro
+- `images/arjs.png` - Captura do padrão AR.js
+- `images/custom.png` - Captura do padrão customizado
+
+Se as imagens não estiverem presentes, a página exibirá placeholders coloridos automáticamente.
 
 ## 🔧 Desenvolvimento
 
