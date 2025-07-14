@@ -90,32 +90,48 @@
             width: 120px;
             height: 120px;
             background: #fff;
-            border: 2px dashed #cbd5e0;
+            border: 2px solid #e2e8f0;
             border-radius: 10px;
             margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
-            color: #718096;
             position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .pattern-preview.hiro {
+        .pattern-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .pattern-preview.placeholder {
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            font-size: 0.8rem;
+            color: #718096;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .pattern-preview.hiro.placeholder {
             background: #4299e1;
             color: white;
             border: none;
             font-weight: bold;
         }
 
-        .pattern-preview.arjs {
+        .pattern-preview.arjs.placeholder {
             background: #48bb78;
             color: white;
             border: none;
             font-weight: bold;
         }
 
-        .pattern-preview.custom {
+        .pattern-preview.custom.placeholder {
             background: #ed8936;
             color: white;
             border: none;
@@ -268,9 +284,9 @@
 
                 <div class="patterns-grid">
                     <div class="pattern-card">
-                        <div class="pattern-preview hiro">
-                            HIRO<br>
-                            <small>Padrão Integrado</small>
+                        <div class="pattern-preview">
+                            <img src="images/hiro.png" alt="Padrão Hiro"
+                                 onerror="this.parentElement.innerHTML='<div style=\'text-align:center; font-size:0.8rem; color:#2b6cb7; font-weight:bold;\'>HIRO<br><small>Padrão Integrado</small></div>'; this.parentElement.classList.add('hiro', 'placeholder');">
                         </div>
                         <h3>Padrão Hiro</h3>
                         <p>Um marcador clássico do AR.js que está integrado ao sistema</p>
@@ -278,9 +294,9 @@
                     </div>
 
                     <div class="pattern-card">
-                        <div class="pattern-preview arjs">
-                            AR.JS<br>
-                            <small>Padrão Personalizado</small>
+                        <div class="pattern-preview">
+                            <img src="images/arjs.png" alt="Padrão AR.js"
+                                 onerror="this.parentElement.innerHTML='<div style=\'text-align:center; font-size:0.8rem; color:#2f855a; font-weight:bold;\'>AR.JS<br><small>Padrão Personalizado</small></div>'; this.parentElement.classList.add('arjs', 'placeholder');">
                         </div>
                         <h3>Padrão AR.js</h3>
                         <p>Arquivo de padrão personalizado para demonstrações AR.js</p>
@@ -288,12 +304,12 @@
                     </div>
 
                     <div class="pattern-card">
-                        <div class="pattern-preview custom">
-                            CUSTOM<br>
-                            <small>Padrão Geométrico</small>
+                        <div class="pattern-preview">
+                            <img src="images/custom.png" alt="Padrão Personalizado"
+                                 onerror="this.parentElement.innerHTML='<div style=\'text-align:center; font-size:0.8rem; color:#c05621; font-weight:bold;\'>CUSTOM<br><small>Padrão Geométrico</small></div>'; this.parentElement.classList.add('custom', 'placeholder');">
                         </div>
-                        <h3>Geométrico Personalizado</h3>
-                        <p>Padrão geométrico único com sobreposição de modelo 3D</p>
+                        <h3>Logo do ECOA</h3>
+                        <p>Padrão com sobreposição de modelo 3D</p>
                         <div class="ar-object">🥑 Modelo 3D de Abacate</div>
                     </div>
                 </div>
