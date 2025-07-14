@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Experience - Pattern Recognition</title>
+    <title>Experiência AR - ECOA PUC-Rio</title>
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -156,25 +156,25 @@
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
       <div class="loader"></div>
-      <h2>Initializing AR Experience</h2>
-      <p>Please allow camera access when prompted</p>
+      <h2>Iniciando Experiência AR</h2>
+      <p>Por favor, permita acesso à câmera quando solicitado</p>
     </div>
 
     <!-- Navigation Overlay -->
     <div class="nav-overlay">
       <a href="index.html" class="back-button">
-        ← Back to Home
+        ← Voltar ao Início
       </a>
-      <div class="status-text">Point camera at patterns</div>
+      <div class="status-text">Aponte a câmera para os padrões</div>
     </div>
 
     <!-- Instructions Overlay -->
     <div class="instructions-overlay" id="instructionsOverlay">
-      <div>Point your camera at any of these patterns to see 3D objects:</div>
+      <div>Aponte sua câmera para qualquer um destes padrões para ver objetos 3D:</div>
       <div class="pattern-indicators">
-        <span class="pattern-indicator hiro">HIRO → Sphere + Cylinder</span>
-        <span class="pattern-indicator arjs">AR.JS → Blue Box</span>
-        <span class="pattern-indicator custom">CUSTOM → Avocado</span>
+        <span class="pattern-indicator hiro">HIRO → Esfera + Cilindro</span>
+        <span class="pattern-indicator arjs">AR.JS → Cubo Azul</span>
+        <span class="pattern-indicator custom">CUSTOM → Abacate</span>
       </div>
     </div>
 
@@ -242,18 +242,18 @@
 
       // Handle errors gracefully
       window.addEventListener('error', function(e) {
-        console.error('AR Experience Error:', e);
+        console.error('Erro na Experiência AR:', e);
         hideLoadingScreen();
       });
 
       // Handle camera permission denial
       navigator.mediaDevices?.getUserMedia({ video: true })
         .then(() => {
-          console.log('Camera access granted');
+          console.log('Acesso à câmera concedido');
         })
         .catch((err) => {
-          console.error('Camera access denied:', err);
-          alert('Camera access is required for the AR experience. Please refresh and allow camera access.');
+          console.error('Acesso à câmera negado:', err);
+          alert('O acesso à câmera é necessário para a experiência AR. Por favor, atualize a página e permita o acesso à câmera.');
         });
     </script>
   </body>
