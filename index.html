@@ -1,33 +1,340 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  </head>
-  <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Pattern Recognition Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- A tag abaixo define o que aparecerá para o marcador com o texto "Ar.js".-->
-    <a-marker type="pattern" url="files/arjs.patt">
-        <a-box position="0 0.5 0" rotation="0 0 0" color="#4CC3D9"></a-box>
-      </a-marker>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
 
-    <!-- A tag abaixo define o que aparecerá para o marcador com o texto "Hiro" (padrão).-->
-      <a-marker preset="hiro">
-        <a-sphere position="0 0.5 0" radius="1.25" color="#EF2D5E"></a-sphere>
-        <a-cylinder position="0 1.75 0" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-      </a-marker>
-    <!-- A tag abaixo define o que aparecerá para o marcador com uma ilustração geométrica.-->
-    <a-marker type="pattern" url="files/custom.patt">
-      <a-entity
-        gltf-model="files/Avocado.glb"
-                rotation="0 180 0"
-                scale="20 20 20"
-        ></a-entity>
-    </a-marker>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-      <!-- Camera with position override to avoid conflicts -->
-      <a-entity camera></a-entity>
-    </a-scene>
-  </body>
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 400;
+        }
+
+        .patterns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .pattern-card {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .pattern-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .pattern-preview {
+            width: 120px;
+            height: 120px;
+            background: #fff;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #718096;
+            position: relative;
+        }
+
+        .pattern-preview.hiro {
+            background: #4299e1;
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .pattern-preview.arjs {
+            background: #48bb78;
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .pattern-preview.custom {
+            background: #ed8936;
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .pattern-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .pattern-card p {
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        .ar-object {
+            font-size: 0.85rem;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #e6fffa;
+            border-radius: 20px;
+            color: #234e52;
+            display: inline-block;
+        }
+
+        .instructions {
+            background: #edf2f7;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .instructions h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .instructions ol {
+            color: #4a5568;
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .requirements {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .requirements h4 {
+            color: #c53030;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .requirements ul {
+            color: #744210;
+            margin-left: 20px;
+        }
+
+        .requirements li {
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .main-content {
+                padding: 25px;
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .patterns-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .pattern-preview {
+                width: 100px;
+                height: 100px;
+            }
+
+            .start-button {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>AR Pattern Recognition</h1>
+            <p>Explore augmented reality by pointing your camera at the patterns below. Watch as 3D objects appear in your real world!</p>
+        </header>
+
+        <main class="main-content">
+            <section class="section">
+                <h2>Available AR Patterns</h2>
+                <p>Print or display any of these patterns on your screen, then use your camera to see them come to life:</p>
+
+                <div class="patterns-grid">
+                    <div class="pattern-card">
+                        <div class="pattern-preview hiro">
+                            HIRO<br>
+                            <small>Built-in Pattern</small>
+                        </div>
+                        <h3>Hiro Pattern</h3>
+                        <p>A classic AR.js marker that's built into the system</p>
+                        <div class="ar-object">🔴 Red Sphere + 🟡 Yellow Cylinder</div>
+                    </div>
+
+                    <div class="pattern-card">
+                        <div class="pattern-preview arjs">
+                            AR.JS<br>
+                            <small>Custom Pattern</small>
+                        </div>
+                        <h3>AR.js Pattern</h3>
+                        <p>Custom pattern file for AR.js demonstrations</p>
+                        <div class="ar-object">🟦 Blue Box</div>
+                    </div>
+
+                    <div class="pattern-card">
+                        <div class="pattern-preview custom">
+                            CUSTOM<br>
+                            <small>Geometric Pattern</small>
+                        </div>
+                        <h3>Custom Geometric</h3>
+                        <p>Unique geometric pattern with 3D model overlay</p>
+                        <div class="ar-object">🥑 3D Avocado Model</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="instructions">
+                    <h3>How to Use This AR Experience</h3>
+                    <ol>
+                        <li><strong>Print or Display Patterns:</strong> You can either print the patterns on paper or display them on another screen</li>
+                        <li><strong>Allow Camera Access:</strong> When prompted, grant camera permission to your browser</li>
+                        <li><strong>Point Your Camera:</strong> Aim your device's camera at any of the patterns above</li>
+                        <li><strong>Watch the Magic:</strong> 3D objects will appear overlaid on the real-world patterns</li>
+                        <li><strong>Move Around:</strong> Try moving your device to see the 3D objects from different angles</li>
+                    </ol>
+                </div>
+
+                <div class="requirements">
+                    <h4>Requirements</h4>
+                    <ul>
+                        <li>Modern web browser with camera support</li>
+                        <li>HTTPS connection (required for camera access)</li>
+                        <li>Good lighting for optimal pattern detection</li>
+                        <li>Printed patterns or secondary display device</li>
+                    </ul>
+                </div>
+            </section>
+
+            <div class="cta-section">
+                <a href="ar.html" class="start-button">
+                    🚀 Start AR Experience
+                </a>
+                <p style="margin-top: 15px; color: #718096; font-size: 0.9rem;">
+                    Make sure you have patterns ready before starting
+                </p>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Built with A-Frame and AR.js • Educational AR Experience</p>
+        </footer>
+    </div>
+</body>
 </html>

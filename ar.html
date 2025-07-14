@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Experience - Pattern Recognition</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+      /* Navigation overlay styles */
+      .nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .back-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .back-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .status-text {
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .instructions-overlay {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        z-index: 9998;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .pattern-indicators {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .pattern-indicator {
+        padding: 4px 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        font-size: 11px;
+      }
+
+      .pattern-indicator.hiro { background: rgba(66, 153, 225, 0.3); }
+      .pattern-indicator.arjs { background: rgba(72, 187, 120, 0.3); }
+      .pattern-indicator.custom { background: rgba(237, 137, 54, 0.3); }
+
+      /* Hide instructions after 10 seconds */
+      .instructions-overlay.fade-out {
+        opacity: 0;
+        transition: opacity 2s ease;
+      }
+
+      /* Loading screen */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .loading-screen.hidden {
+        display: none;
+      }
+
+      .loader {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      @media (max-width: 768px) {
+        .nav-overlay {
+          padding: 12px 15px;
+        }
+
+        .back-button {
+          padding: 8px 16px;
+          font-size: 13px;
+        }
+
+        .instructions-overlay {
+          bottom: 15px;
+          left: 15px;
+          right: 15px;
+          padding: 12px;
+          font-size: 12px;
+        }
+
+        .pattern-indicators {
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loader"></div>
+      <h2>Initializing AR Experience</h2>
+      <p>Please allow camera access when prompted</p>
+    </div>
+
+    <!-- Navigation Overlay -->
+    <div class="nav-overlay">
+      <a href="index.html" class="back-button">
+        ← Back to Home
+      </a>
+      <div class="status-text">Point camera at patterns</div>
+    </div>
+
+    <!-- Instructions Overlay -->
+    <div class="instructions-overlay" id="instructionsOverlay">
+      <div>Point your camera at any of these patterns to see 3D objects:</div>
+      <div class="pattern-indicators">
+        <span class="pattern-indicator hiro">HIRO → Sphere + Cylinder</span>
+        <span class="pattern-indicator arjs">AR.JS → Blue Box</span>
+        <span class="pattern-indicator custom">CUSTOM → Avocado</span>
+      </div>
+    </div>
+
+    <!-- AR Scene -->
+    <a-scene
+      embedded
+      arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+      vr-mode-ui="enabled: false">
+
+      <!-- AR.js pattern marker - Blue Box -->
+      <a-marker type="pattern" url="files/arjs.patt">
+        <a-box position="0 0.5 0" rotation="0 0 0" color="#4CC3D9"></a-box>
+      </a-marker>
+
+      <!-- Hiro pattern marker - Red Sphere with Yellow Cylinder -->
+      <a-marker preset="hiro">
+        <a-sphere position="0 0.5 0" radius="1.25" color="#EF2D5E"></a-sphere>
+        <a-cylinder position="0 1.75 0" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+      </a-marker>
+
+      <!-- Custom pattern marker - 3D Avocado Model -->
+      <a-marker type="pattern" url="files/custom.patt">
+        <a-entity
+          gltf-model="files/Avocado.glb"
+          rotation="0 180 0"
+          scale="20 20 20">
+        </a-entity>
+      </a-marker>
+
+      <!-- Camera entity -->
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      // Hide loading screen once AR scene is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        // Wait for A-Frame to be ready
+        const scene = document.querySelector('a-scene');
+
+        if (scene.hasLoaded) {
+          hideLoadingScreen();
+        } else {
+          scene.addEventListener('loaded', hideLoadingScreen);
+        }
+
+        // Also hide after 5 seconds as fallback
+        setTimeout(hideLoadingScreen, 5000);
+
+        // Auto-hide instructions after 10 seconds
+        setTimeout(function() {
+          const instructions = document.getElementById('instructionsOverlay');
+          if (instructions) {
+            instructions.classList.add('fade-out');
+            setTimeout(() => instructions.style.display = 'none', 2000);
+          }
+        }, 10000);
+      });
+
+      function hideLoadingScreen() {
+        const loadingScreen = document.getElementById('loadingScreen');
+        if (loadingScreen) {
+          loadingScreen.classList.add('hidden');
+        }
+      }
+
+      // Handle errors gracefully
+      window.addEventListener('error', function(e) {
+        console.error('AR Experience Error:', e);
+        hideLoadingScreen();
+      });
+
+      // Handle camera permission denial
+      navigator.mediaDevices?.getUserMedia({ video: true })
+        .then(() => {
+          console.log('Camera access granted');
+        })
+        .catch((err) => {
+          console.error('Camera access denied:', err);
+          alert('Camera access is required for the AR experience. Please refresh and allow camera access.');
+        });
+    </script>
+  </body>
+</html>
