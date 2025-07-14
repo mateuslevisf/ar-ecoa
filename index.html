@@ -207,6 +207,48 @@
             box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
         }
 
+        .download-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .download-btn:hover {
+            background: #38a169;
+            transform: translateY(-1px);
+        }
+
+        .print-instructions {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .print-instructions h4 {
+            color: #234e52;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .print-instructions p {
+            color: #2d5016;
+            margin: 8px 0;
+            font-size: 0.95rem;
+        }
+
         .requirements {
             background: #fff5f5;
             border: 1px solid #fed7d7;
@@ -291,6 +333,9 @@
                         <h3>Padrão Hiro</h3>
                         <p>Um marcador clássico do AR.js que está integrado ao sistema</p>
                         <div class="ar-object">🔴 Esfera Vermelha + 🟡 Cilindro Amarelo</div>
+                        <button class="download-btn" onclick="downloadImage('images/hiro.png', 'padrao-hiro.png')">
+                            📥 Baixar para Imprimir
+                        </button>
                     </div>
 
                     <div class="pattern-card">
@@ -301,6 +346,9 @@
                         <h3>Padrão AR.js</h3>
                         <p>Arquivo de padrão personalizado para demonstrações AR.js</p>
                         <div class="ar-object">🟦 Cubo Azul</div>
+                        <button class="download-btn" onclick="downloadImage('images/arjs.png', 'padrao-arjs.png')">
+                            📥 Baixar para Imprimir
+                        </button>
                     </div>
 
                     <div class="pattern-card">
@@ -308,10 +356,23 @@
                             <img src="images/custom.png" alt="Padrão Personalizado"
                                  onerror="this.parentElement.innerHTML='<div style=\'text-align:center; font-size:0.8rem; color:#c05621; font-weight:bold;\'>CUSTOM<br><small>Padrão Geométrico</small></div>'; this.parentElement.classList.add('custom', 'placeholder');">
                         </div>
-                        <h3>Logo do ECOA</h3>
-                        <p>Padrão com sobreposição de modelo 3D</p>
+                        <h3>Geométrico Personalizado</h3>
+                        <p>Padrão geométrico único com sobreposição de modelo 3D</p>
                         <div class="ar-object">🥑 Modelo 3D de Abacate</div>
+                        <button class="download-btn" onclick="downloadImage('images/custom.png', 'padrao-custom.png')">
+                            📥 Baixar para Imprimir
+                        </button>
                     </div>
+                </div>
+
+                <div class="print-instructions">
+                    <h4>📄 Dica para Impressão</h4>
+                    <p><strong>Baixe e imprima</strong> qualquer padrão acima em papel branco comum</p>
+                    <p>Coloque o papel impresso numa <strong>superfície plana</strong> (mesa, livro) para melhor detecção</p>
+                    <p>💡 <em>Também funciona exibindo a imagem em outra tela ou tablet!</em></p>
+                    <button class="download-btn" onclick="downloadAllPatterns()" style="background: #667eea; margin-top: 15px;">
+                        📦 Baixar Todos os Padrões
+                    </button>
                 </div>
             </section>
 
@@ -319,9 +380,10 @@
                 <div class="instructions">
                     <h3>Como Usar Esta Experiência AR</h3>
                     <ol>
-                        <li><strong>Imprima ou Exiba os Padrões:</strong> Você pode imprimir os padrões em papel ou exibi-los em outra tela</li>
+                        <li><strong>Baixe e Imprima os Padrões:</strong> Clique nos botões "📥 Baixar para Imprimir" acima e imprima em papel branco comum (tamanho A4)</li>
+                        <li><strong>Posicione na Mesa:</strong> Coloque o papel impresso numa superfície plana e bem iluminada</li>
                         <li><strong>Permita Acesso à Câmera:</strong> Quando solicitado, conceda permissão de câmera ao seu navegador</li>
-                        <li><strong>Aponte Sua Câmera:</strong> Direcione a câmera do seu dispositivo para qualquer um dos padrões acima</li>
+                        <li><strong>Aponte Sua Câmera:</strong> Direcione a câmera do seu dispositivo para qualquer um dos padrões impressos</li>
                         <li><strong>Observe a Mágica:</strong> Objetos 3D aparecerão sobrepostos aos padrões do mundo real</li>
                         <li><strong>Mova-se:</strong> Tente mover seu dispositivo para ver os objetos 3D de diferentes ângulos</li>
                     </ol>
@@ -333,7 +395,8 @@
                         <li>Navegador web moderno com suporte à câmera</li>
                         <li>Conexão HTTPS (necessária para acesso à câmera)</li>
                         <li>Boa iluminação para detecção ideal dos padrões</li>
-                        <li>Padrões impressos ou dispositivo de exibição secundário</li>
+                        <li><strong>Padrões impressos</strong> ou exibidos em tela secundária</li>
+                        <li>Superfície plana para colocar os padrões</li>
                     </ul>
                 </div>
             </section>
@@ -352,5 +415,126 @@
             <p>Desenvolvido com A-Frame e AR.js • ECOA PUC-Rio • Experiência Educacional AR</p>
         </footer>
     </div>
+
+    <script>
+        // Função para download das imagens dos padrões
+        async function downloadImage(imageSrc, filename) {
+            try {
+                // Tenta fazer o download da imagem
+                const response = await fetch(imageSrc);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+
+                    const link = document.createElement('a');
+                    link.style.display = 'none';
+                    link.href = url;
+                    link.download = filename;
+
+                    document.body.appendChild(link);
+                    link.click();
+
+                    // Cleanup
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(link);
+
+                    // Feedback para o usuário
+                    showDownloadFeedback('✅ Download iniciado! Verifique sua pasta de downloads.');
+                } else {
+                    throw new Error('Imagem não encontrada');
+                }
+            } catch (error) {
+                console.error('Erro no download:', error);
+                showDownloadFeedback('⚠️ Imagem não disponível. Você pode fazer screenshot da visualização acima.');
+            }
+        }
+
+        // Feedback visual para o usuário
+        async function downloadAllPatterns() {
+            const patterns = [
+                { src: 'images/hiro.png', name: 'padrao-hiro.png' },
+                { src: 'images/arjs.png', name: 'padrao-arjs.png' },
+                { src: 'images/custom.png', name: 'padrao-custom.png' }
+            ];
+
+            showDownloadFeedback('📦 Iniciando download de todos os padrões...');
+
+            let successCount = 0;
+            for (const pattern of patterns) {
+                try {
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Delay entre downloads
+                    await downloadImage(pattern.src, pattern.name);
+                    successCount++;
+                } catch (error) {
+                    console.error(`Erro ao baixar ${pattern.name}:`, error);
+                }
+            }
+
+            if (successCount === patterns.length) {
+                showDownloadFeedback(`✅ Todos os ${successCount} padrões foram baixados com sucesso!`);
+            } else if (successCount > 0) {
+                showDownloadFeedback(`⚠️ ${successCount} de ${patterns.length} padrões foram baixados. Verifique se todas as imagens existem.`);
+            } else {
+                showDownloadFeedback('❌ Nenhum padrão pôde ser baixado. Verifique se as imagens estão na pasta images/');
+            }
+        }
+        function showDownloadFeedback(message) {
+            // Remove feedback anterior se existir
+            const existingFeedback = document.getElementById('download-feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+
+            // Cria novo feedback
+            const feedback = document.createElement('div');
+            feedback.id = 'download-feedback';
+            feedback.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                z-index: 10000;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-size: 14px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            feedback.textContent = message;
+
+            document.body.appendChild(feedback);
+
+            // Animação de entrada
+            setTimeout(() => {
+                feedback.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Remove após 4 segundos
+            setTimeout(() => {
+                feedback.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (feedback.parentNode) {
+                        feedback.parentNode.removeChild(feedback);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Melhora a experiência dos botões de download
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadButtons = document.querySelectorAll('.download-btn');
+            downloadButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'translateY(-1px)';
+                    }, 150);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
