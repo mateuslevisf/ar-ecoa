@@ -3,538 +3,415 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Experiência de Realidade Aumentada - ECOA PUC-Rio</title>
+    <title>AR Experience</title>
+
+    <!-- AR.js scripts -->
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
+        .main-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            z-index: 1000;
+        }
+
+        .main-screen.hidden {
+            display: none;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            text-align: center;
+            max-width: 400px;
         }
 
-        .header {
-            text-align: center;
+        h1 {
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .ar-button {
+            background: #007AFF;
             color: white;
-            margin-bottom: 40px;
-            padding: 40px 20px;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            min-width: 120px;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            font-weight: 300;
+        .ar-button:hover {
+            background: #0056CC;
         }
 
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
+        .webxr-button {
+            background: #34C759;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            min-width: 120px;
         }
 
-        .main-content {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        .webxr-button:hover {
+            background: #28A745;
         }
 
-        .section {
-            margin-bottom: 40px;
+        .instructions {
+            margin-top: 30px;
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.5;
         }
 
-        .section h2 {
-            color: #4a5568;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            font-weight: 400;
-        }
-
-        .patterns-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-
-        .pattern-card {
-            background: #f8fafc;
-            border-radius: 15px;
-            padding: 25px;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .pattern-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-color: #667eea;
+        .device-info {
+            margin-top: 20px;
+            font-size: 12px;
+            opacity: 0.6;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
         }
 
         .pattern-preview {
-            width: 120px;
-            height: 120px;
-            background: #fff;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 200px;
+            margin: 20px auto;
+            border: 2px solid #007AFF;
+            border-radius: 8px;
+            background: white;
+            padding: 10px;
         }
 
         .pattern-preview img {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
+            height: auto;
         }
 
-        .pattern-preview.placeholder {
-            background: #f7fafc;
-            border: 2px dashed #cbd5e0;
-            font-size: 0.8rem;
-            color: #718096;
-            text-align: center;
-            padding: 10px;
+        /* Navigation overlay styles (from your working code) */
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
         }
 
-        .pattern-preview.hiro.placeholder {
-            background: #4299e1;
-            color: white;
-            border: none;
-            font-weight: bold;
+        .nav-overlay.show {
+            display: flex;
         }
 
-        .pattern-preview.arjs.placeholder {
-            background: #48bb78;
-            color: white;
-            border: none;
-            font-weight: bold;
-        }
-
-        .pattern-preview.custom.placeholder {
-            background: #ed8936;
-            color: white;
-            border: none;
-            font-weight: bold;
-        }
-
-        .pattern-card h3 {
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-        }
-
-        .pattern-card p {
-            color: #718096;
-            font-size: 0.95rem;
-        }
-
-        .ar-object {
-            font-size: 0.85rem;
-            margin-top: 10px;
-            padding: 8px 12px;
-            background: #e6fffa;
-            border-radius: 20px;
-            color: #234e52;
-            display: inline-block;
-        }
-
-        .instructions {
-            background: #edf2f7;
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-        }
-
-        .instructions h3 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-        }
-
-        .instructions ol {
-            color: #4a5568;
-            margin-left: 20px;
-        }
-
-        .instructions li {
-            margin-bottom: 12px;
-            font-size: 1.05rem;
-        }
-
-        .cta-section {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .start-button {
+        .back-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 18px 40px;
-            font-size: 1.2rem;
             border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 10px 20px;
+            border-radius: 25px;
             text-decoration: none;
-            display: inline-block;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .start-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
-        }
-
-        .download-btn {
-            background: #48bb78;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
             cursor: pointer;
-            font-size: 0.85rem;
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            margin-top: 10px;
+            gap: 8px;
         }
 
-        .download-btn:hover {
-            background: #38a169;
+        .back-button:hover {
             transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .print-instructions {
-            background: #e6fffa;
-            border: 1px solid #81e6d9;
+        .status-text {
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .instructions-overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 9998;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
             border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 13px;
             text-align: center;
+            backdrop-filter: blur(10px);
+            display: none;
         }
 
-        .print-instructions h4 {
-            color: #234e52;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+        .instructions-overlay.show {
+            display: block;
         }
 
-        .print-instructions p {
-            color: #2d5016;
-            margin: 8px 0;
-            font-size: 0.95rem;
+        /* Hide instructions after 10 seconds */
+        .instructions-overlay.fade-out {
+            opacity: 0;
+            transition: opacity 2s ease;
         }
 
-        .requirements {
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
+        /* Loading screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .requirements h4 {
-            color: #c53030;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+        .loading-screen.show {
+            display: flex;
         }
 
-        .requirements ul {
-            color: #744210;
-            margin-left: 20px;
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
 
-        .requirements li {
-            margin-bottom: 5px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
+            .nav-overlay {
+                padding: 12px 15px;
             }
 
-            .header p {
-                font-size: 1rem;
+            .back-button {
+                padding: 8px 16px;
+                font-size: 13px;
             }
 
-            .main-content {
-                padding: 25px;
-                margin: 10px;
-                border-radius: 15px;
+            .instructions-overlay {
+                bottom: 15px;
+                left: 15px;
+                right: 15px;
+                padding: 12px;
+                font-size: 12px;
             }
-
-            .patterns-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .pattern-preview {
-                width: 100px;
-                height: 100px;
-            }
-
-            .start-button {
-                padding: 15px 30px;
-                font-size: 1.1rem;
-            }
-        }
-
-        .footer {
-            text-align: center;
-            color: white;
-            opacity: 0.8;
-            padding: 20px;
-            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>Experiência de Realidade Aumentada • <strong>ECOA PUC-Rio</strong> </h1>
-            <p>Explore a realidade aumentada apontando sua câmera para os padrões abaixo. Veja objetos 3D aparecerem no mundo real!</p>
-        </header>
-
-        <main class="main-content">
-            <section class="section">
-                <h2>Padrões AR Disponíveis</h2>
-                <p>Imprima ou exiba qualquer um destes padrões na sua tela e depois use sua câmera para vê-los ganhar vida:</p>
-
-                <div class="patterns-grid">
-                    <div class="pattern-card">
-                        <div class="pattern-preview">
-                            <img src="images/hiro.png" alt="Padrão Hiro"
-                                 onerror="this.parentElement.innerHTML='<div style=\'text-align:center; font-size:0.8rem; color:#2b6cb7; font-weight:bold;\'>HIRO<br><small>Padrão Integrado</small></div>'; this.parentElement.classList.add('hiro', 'placeholder');">
-                        </div>
-                        <h3>Padrão Hiro</h3>
-                        <p>Um marcador clássico do AR.js que está integrado ao sistema</p>
-                        <div class="ar-object">🔴 Esfera Vermelha + 🟡 Cilindro Amarelo</div>
-                        <button class="download-btn" onclick="downloadImage('images/hiro.png', 'padrao-hiro.png')">
-                            📥 Baixar para Imprimir
-                        </button>
-                    </div>
-
-                    <div class="pattern-card">
-                        <div class="pattern-preview">
-                            <img src="images/arjs.png" alt="Padrão AR.js"
-                                 onerror="this.parentElement.innerHTML='<div style=\'text-align:center; font-size:0.8rem; color:#2f855a; font-weight:bold;\'>AR.JS<br><small>Padrão Personalizado</small></div>'; this.parentElement.classList.add('arjs', 'placeholder');">
-                        </div>
-                        <h3>Padrão AR.js</h3>
-                        <p>Arquivo de padrão personalizado para demonstrações AR.js</p>
-                        <div class="ar-object">🟦 Cubo Azul</div>
-                        <button class="download-btn" onclick="downloadImage('images/arjs.png', 'padrao-arjs.png')">
-                            📥 Baixar para Imprimir
-                        </button>
-                    </div>
-
-                    <div class="pattern-card">
-                        <div class="pattern-preview">
-                            <img src="images/custom.png" alt="Padrão Personalizado"
-                                 onerror="this.parentElement.innerHTML='<div style=\'text-align:center; font-size:0.8rem; color:#c05621; font-weight:bold;\'>CUSTOM<br><small>Padrão Geométrico</small></div>'; this.parentElement.classList.add('custom', 'placeholder');">
-                        </div>
-                        <h3>Geométrico Personalizado</h3>
-                        <p>Padrão geométrico único com sobreposição de modelo 3D</p>
-                        <div class="ar-object">🥑 Modelo 3D de Abacate</div>
-                        <button class="download-btn" onclick="downloadImage('images/custom.png', 'padrao-custom.png')">
-                            📥 Baixar para Imprimir
-                        </button>
-                    </div>
-                </div>
-
-                <div class="print-instructions">
-                    <h4>📄 Dica para Impressão</h4>
-                    <p><strong>Baixe e imprima</strong> qualquer padrão acima em papel branco comum</p>
-                    <p>Coloque o papel impresso numa <strong>superfície plana</strong> (mesa, livro) para melhor detecção</p>
-                    <p>💡 <em>Também funciona exibindo a imagem em outra tela ou tablet!</em></p>
-                    <button class="download-btn" onclick="downloadAllPatterns()" style="background: #667eea; margin-top: 15px;">
-                        📦 Baixar Todos os Padrões
-                    </button>
-                </div>
-            </section>
-
-            <section class="section">
-                <div class="instructions">
-                    <h3>Como Usar Esta Experiência AR</h3>
-                    <ol>
-                        <li><strong>Baixe e Imprima os Padrões:</strong> Clique nos botões "📥 Baixar para Imprimir" acima e imprima em papel branco comum (tamanho A4)</li>
-                        <li><strong>Posicione na Mesa:</strong> Coloque o papel impresso numa superfície plana e bem iluminada</li>
-                        <li><strong>Permita Acesso à Câmera:</strong> Quando solicitado, conceda permissão de câmera ao seu navegador</li>
-                        <li><strong>Aponte Sua Câmera:</strong> Direcione a câmera do seu dispositivo para qualquer um dos padrões impressos</li>
-                        <li><strong>Observe a Mágica:</strong> Objetos 3D aparecerão sobrepostos aos padrões do mundo real</li>
-                        <li><strong>Mova-se:</strong> Tente mover seu dispositivo para ver os objetos 3D de diferentes ângulos</li>
-                    </ol>
-                </div>
-
-                <div class="requirements">
-                    <h4>Requisitos</h4>
-                    <ul>
-                        <li>Navegador web moderno com suporte à câmera</li>
-                        <li>Conexão HTTPS (necessária para acesso à câmera)</li>
-                        <li>Boa iluminação para detecção ideal dos padrões</li>
-                        <li><strong>Padrões impressos</strong> ou exibidos em tela secundária</li>
-                        <li>Superfície plana para colocar os padrões</li>
-                    </ul>
-                </div>
-            </section>
-
-            <div class="cta-section">
-                <a href="ar.html" class="start-button">
-                    🚀 Iniciar Experiência AR
-                </a>
-                <p style="margin-top: 15px; color: #718096; font-size: 0.9rem;">
-                    Certifique-se de ter os padrões prontos antes de começar
-                </p>
-            </div>
-        </main>
-
-        <footer class="footer">
-            <p>Desenvolvido com A-Frame e AR.js • ECOA PUC-Rio • Experiência Educacional AR</p>
-        </footer>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <h2>Starting AR Experience</h2>
+        <p>Please allow camera access when requested</p>
     </div>
 
+    <!-- Main Selection Screen -->
+    <div class="main-screen" id="mainScreen">
+        <div class="container">
+            <h1>🥑 AR Model Viewer</h1>
+
+            <!-- AR QuickLook Button (iOS Safari) -->
+            <a href="files/Avocado.usdz" rel="ar" class="ar-button">
+                AR
+            </a>
+
+            <!-- WebAR Button (AR.js) -->
+            <button class="webxr-button" onclick="startWebAR()">
+                WebAR
+            </button>
+
+            <div class="instructions">
+                <p><strong>AR:</strong> Uses your device's native AR (iOS/Android)</p>
+                <p><strong>WebAR:</strong> Point camera at the pattern below</p>
+
+                <div class="pattern-preview">
+                    <img src="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/HIRO.jpg"
+                         alt="AR Pattern"
+                         onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\'padding:20px;color:#666;\'>AR Pattern<br><small>Print this pattern</small></div>'">
+                </div>
+                <p><em>Print or display this pattern for WebAR tracking</em></p>
+            </div>
+
+            <div class="device-info" id="deviceInfo">
+                <p>Browser: <span id="browserInfo"></span></p>
+                <p>Platform: <span id="platformInfo"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Overlay -->
+    <div class="nav-overlay" id="navOverlay">
+        <button class="back-button" onclick="goBack()">
+            ← Back to Menu
+        </button>
+        <div class="status-text">Point camera at the pattern</div>
+    </div>
+
+    <!-- Instructions Overlay -->
+    <div class="instructions-overlay" id="instructionsOverlay">
+        <div>Point your camera at the printed pattern to see the 3D avocado model!</div>
+    </div>
+
+    <!-- AR Scene (exactly like your working code) -->
+    <a-scene
+        id="arScene"
+        embedded
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false"
+        style="margin: 0; overflow: hidden;">
+
+        <!-- Hiro pattern marker with Avocado model -->
+        <a-marker preset="hiro">
+            <a-entity
+                gltf-model="url(./files/Avocado.glb)"
+                rotation="0 180 0"
+                scale="10 10 10"
+                position="0 0 0">
+            </a-entity>
+        </a-marker>
+
+        <!-- Camera entity -->
+        <a-entity camera></a-entity>
+    </a-scene>
+
     <script>
-        // Função para download das imagens dos padrões
-        async function downloadImage(imageSrc, filename) {
-            try {
-                // Tenta fazer o download da imagem
-                const response = await fetch(imageSrc);
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
+        // Display device info
+        document.getElementById('browserInfo').textContent = navigator.userAgent.includes('Safari') ? 'Safari' : 'Other';
+        document.getElementById('platformInfo').textContent = navigator.platform;
 
-                    const link = document.createElement('a');
-                    link.style.display = 'none';
-                    link.href = url;
-                    link.download = filename;
+        function startWebAR() {
+            // Show loading screen briefly
+            document.getElementById('loadingScreen').classList.add('show');
 
-                    document.body.appendChild(link);
-                    link.click();
-
-                    // Cleanup
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(link);
-
-                    // Feedback para o usuário
-                    showDownloadFeedback('✅ Download iniciado! Verifique sua pasta de downloads.');
-                } else {
-                    throw new Error('Imagem não encontrada');
-                }
-            } catch (error) {
-                console.error('Erro no download:', error);
-                showDownloadFeedback('⚠️ Imagem não disponível. Você pode fazer screenshot da visualização acima.');
-            }
-        }
-
-        // Feedback visual para o usuário
-        async function downloadAllPatterns() {
-            const patterns = [
-                { src: 'images/hiro.png', name: 'padrao-hiro.png' },
-                { src: 'images/arjs.png', name: 'padrao-arjs.png' },
-                { src: 'images/custom.png', name: 'padrao-custom.png' }
-            ];
-
-            showDownloadFeedback('📦 Iniciando download de todos os padrões...');
-
-            let successCount = 0;
-            for (const pattern of patterns) {
-                try {
-                    await new Promise(resolve => setTimeout(resolve, 500)); // Delay entre downloads
-                    await downloadImage(pattern.src, pattern.name);
-                    successCount++;
-                } catch (error) {
-                    console.error(`Erro ao baixar ${pattern.name}:`, error);
-                }
-            }
-
-            if (successCount === patterns.length) {
-                showDownloadFeedback(`✅ Todos os ${successCount} padrões foram baixados com sucesso!`);
-            } else if (successCount > 0) {
-                showDownloadFeedback(`⚠️ ${successCount} de ${patterns.length} padrões foram baixados. Verifique se todas as imagens existem.`);
-            } else {
-                showDownloadFeedback('❌ Nenhum padrão pôde ser baixado. Verifique se as imagens estão na pasta images/');
-            }
-        }
-        function showDownloadFeedback(message) {
-            // Remove feedback anterior se existir
-            const existingFeedback = document.getElementById('download-feedback');
-            if (existingFeedback) {
-                existingFeedback.remove();
-            }
-
-            // Cria novo feedback
-            const feedback = document.createElement('div');
-            feedback.id = 'download-feedback';
-            feedback.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: rgba(0, 0, 0, 0.9);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 8px;
-                z-index: 10000;
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                font-size: 14px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                transform: translateX(100%);
-                transition: transform 0.3s ease;
-            `;
-            feedback.textContent = message;
-
-            document.body.appendChild(feedback);
-
-            // Animação de entrada
             setTimeout(() => {
-                feedback.style.transform = 'translateX(0)';
-            }, 100);
+                // Hide main screen and loading
+                document.getElementById('mainScreen').classList.add('hidden');
+                document.getElementById('loadingScreen').classList.remove('show');
 
-            // Remove após 4 segundos
-            setTimeout(() => {
-                feedback.style.transform = 'translateX(100%)';
+                // Show AR overlays
+                document.getElementById('navOverlay').classList.add('show');
+
+                // Show instructions
+                const instructions = document.getElementById('instructionsOverlay');
+                instructions.classList.add('show');
+
+                // Auto-hide instructions after 10 seconds
                 setTimeout(() => {
-                    if (feedback.parentNode) {
-                        feedback.parentNode.removeChild(feedback);
-                    }
-                }, 300);
-            }, 4000);
+                    instructions.classList.add('fade-out');
+                    setTimeout(() => instructions.style.display = 'none', 2000);
+                }, 8000);
+
+            }, 1500);
         }
 
-        // Melhora a experiência dos botões de download
+        function goBack() {
+            // Hide AR overlays
+            document.getElementById('navOverlay').classList.remove('show');
+            document.getElementById('instructionsOverlay').classList.remove('show');
+            document.getElementById('instructionsOverlay').style.display = 'block';
+            document.getElementById('instructionsOverlay').classList.remove('fade-out');
+
+            // Show main screen
+            document.getElementById('mainScreen').classList.remove('hidden');
+        }
+
+        // Hide loading screen once AR scene is ready (from your working code)
         document.addEventListener('DOMContentLoaded', function() {
-            const downloadButtons = document.querySelectorAll('.download-btn');
-            downloadButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = 'translateY(-1px)';
-                    }, 150);
-                });
-            });
+            // Wait for A-Frame to be ready
+            const scene = document.querySelector('a-scene');
+
+            if (scene.hasLoaded) {
+                hideInitialLoading();
+            } else {
+                scene.addEventListener('loaded', hideInitialLoading);
+            }
+
+            // Also hide after 5 seconds as fallback
+            setTimeout(hideInitialLoading, 5000);
         });
+
+        function hideInitialLoading() {
+            // A-Frame is ready, but keep main screen visible
+            console.log('A-Frame loaded and ready');
+        }
+
+        // Handle errors gracefully (from your working code)
+        window.addEventListener('error', function(e) {
+            console.error('AR Experience Error:', e);
+        });
+
+        // Handle camera permission (from your working code)
+        navigator.mediaDevices?.getUserMedia({ video: true })
+            .then(() => {
+                console.log('Camera access granted');
+            })
+            .catch((err) => {
+                console.error('Camera access denied:', err);
+                alert('Camera access is required for AR experience. Please refresh and allow camera access.');
+            });
+
+        // Check AR support
+        function checkARSupport() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+
+            if (isIOS && isSafari) {
+                console.log('iOS Safari detected - AR QuickLook available');
+            } else {
+                console.log('Non-iOS or non-Safari - WebAR available');
+            }
+        }
+
+        checkARSupport();
     </script>
 </body>
 </html>
